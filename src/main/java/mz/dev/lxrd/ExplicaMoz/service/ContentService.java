@@ -4,6 +4,8 @@ import mz.dev.lxrd.ExplicaMoz.domain.Content;
 import mz.dev.lxrd.ExplicaMoz.dto.ContentDTO;
 import mz.dev.lxrd.ExplicaMoz.repository.ContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,13 +80,23 @@ public class ContentService {
     }
 
     @Transactional(readOnly = true)
-    public List<Content> getAllPublished() {
-        return contentRepository.findByStatus("PUBLICADO");
+    public Page<Content> getAllPublished(Pageable pageable) {
+        return contentRepository.findByStatus("PUBLICADO", pageable);
     }
 
     @Transactional(readOnly = true)
-    public List<Content> getByClass(Integer classe) {
-        return contentRepository.findByClasseNumeroAndStatusOrderByDisciplinaAsc(classe, "PUBLICADO");
+    public Page<Content> getByClass(Integer classe, Pageable pageable) {
+        return contentRepository.findByClasseNumeroAndStatus(classe, "PUBLICADO", pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Content> getAll(Pageable pageable) {
+        return contentRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Content> search(String query, Pageable pageable) {
+        return contentRepository.searchPublished(query, pageable);
     }
 
     @Transactional

@@ -6,6 +6,9 @@ import mz.dev.lxrd.ExplicaMoz.dto.ContentDTO;
 import mz.dev.lxrd.ExplicaMoz.repository.ContentRepository;
 import mz.dev.lxrd.ExplicaMoz.service.ContentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +29,8 @@ public class ContentController {
     private ContentRepository contentRepository;
 
     @GetMapping("/publicados")
-    public ResponseEntity<List<Content>> getPublished() {
-        return ResponseEntity.ok(contentService.getAllPublished());
+    public ResponseEntity<Page<Content>> getPublished(@PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(contentService.getAllPublished(pageable));
     }
     @GetMapping("/{id}")
     public ResponseEntity<Content> getById(@PathVariable Long id) {
@@ -37,8 +40,10 @@ public class ContentController {
     }
 
     @GetMapping("/classe/{classe}")
-    public ResponseEntity<List<Content>> getByClass(@PathVariable Integer classe) {
-        return ResponseEntity.ok(contentService.getByClass(classe));
+    public ResponseEntity<Page<Content>> getByClass(
+            @PathVariable Integer classe,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(contentService.getByClass(classe, pageable));
     }
 
     @GetMapping("/slug/{slug}")
@@ -57,6 +62,13 @@ public class ContentController {
             @RequestParam Integer classe,
             @RequestParam String disciplina) {
         return ResponseEntity.ok(contentService.getRelatedContent(id, classe, disciplina));
+    }
+
+    @GetMapping("/busca")
+    public ResponseEntity<Page<Content>> search(
+            @RequestParam String q,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(contentService.search(q, pageable));
     }
 
 }

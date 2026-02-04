@@ -55,7 +55,7 @@ ExplicaMoz é uma plataforma de gestão de conteúdo educacional focada no curr�
 
 ## 📝 Próximos Passos (Backlog)
 
-- [ ] Implementar Spring Security com JWT.
-- [ ] Adicionar paginação nos endpoints de listagem.
-- [ ] Integrar Swagger (OpenAPI) para documentação interativa.
-- [ ] Implementar busca textual.
+- [x] Implementar Spring Security com JWT.
+- [x] Adicionar paginação nos endpoints de listagem.
+- [x] Integrar Swagger (OpenAPI) para documentação interativa.
+- [x] Implementar busca textual.

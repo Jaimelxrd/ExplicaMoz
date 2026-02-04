@@ -5,10 +5,17 @@ import mz.dev.lxrd.ExplicaMoz.domain.Content;
 import mz.dev.lxrd.ExplicaMoz.dto.AdminLoginDTO;
 import mz.dev.lxrd.ExplicaMoz.dto.ContentDTO;
 import mz.dev.lxrd.ExplicaMoz.repository.ContentRepository;
+import mz.dev.lxrd.ExplicaMoz.security.JwtUtil;
 import mz.dev.lxrd.ExplicaMoz.service.ContentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -20,22 +27,29 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class AdminController {
 
-    // SENHA SIMPLES PARA MVP (substituir depois por JWT)
-    private static final String ADMIN_PASSWORD = "admin123";
-
     @Autowired
     private ContentRepository contentRepository;
     @Autowired
     private ContentService contentService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AdminLoginDTO login) {
-        if ("admin".equals(login.getUsername()) && ADMIN_PASSWORD.equals(login.getPassword())) {
-            Map<String, String> response = new HashMap<>();
-            response.put("token", "logged-in"); // Simples para MVP
-            return ResponseEntity.ok(response);
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword())
+            );
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(401).body("Credenciais inválidas");
         }
-        return ResponseEntity.status(401).body("Credenciais inválidas");
+
+        final String token = jwtUtil.generateToken(login.getUsername());
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
@@ -46,8 +60,8 @@ public class AdminController {
     }
 
     @GetMapping("/conteudos")
-    public ResponseEntity<List<Content>> getAllContent() {
-        return ResponseEntity.ok(contentRepository.findAll());
+    public ResponseEntity<Page<Content>> getAllContent(@PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(contentService.getAll(pageable));
     }
 
     @PostMapping
