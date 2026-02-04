@@ -4,11 +4,16 @@ import mz.dev.lxrd.ExplicaMoz.domain.Content;
 import mz.dev.lxrd.ExplicaMoz.dto.ContentDTO;
 import mz.dev.lxrd.ExplicaMoz.repository.ContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.Normalizer;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 public class ContentService {
@@ -18,13 +23,19 @@ public class ContentService {
 
     @Transactional
     public Content createContent(ContentDTO dto) {
+        String slug = dto.getUrlSlug();
+        if (slug == null || slug.trim().isEmpty()) {
+            slug = generateSlug(dto.getTitulo());
+        }
+
         // Verifica se URL já existe
-        if (contentRepository.findByUrlSlug(dto.getUrlSlug()) != null) {
+        if (contentRepository.findByUrlSlug(slug) != null) {
             throw new RuntimeException("URL já existe. Escolha outra.");
         }
 
         Content content = new Content();
         mapDtoToEntity(dto, content);
+        content.setUrlSlug(slug);
 
         return contentRepository.save(content);
     }
@@ -34,15 +45,21 @@ public class ContentService {
         Content content = contentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Conteúdo não encontrado"));
 
+        String newSlug = dto.getUrlSlug();
+        if (newSlug == null || newSlug.trim().isEmpty()) {
+            newSlug = generateSlug(dto.getTitulo());
+        }
+
         // Verifica se nova URL já existe (para outro conteúdo)
-        if (!content.getUrlSlug().equals(dto.getUrlSlug())) {
-            Content existing = contentRepository.findByUrlSlug(dto.getUrlSlug());
+        if (!content.getUrlSlug().equals(newSlug)) {
+            Content existing = contentRepository.findByUrlSlug(newSlug);
             if (existing != null && !existing.getId().equals(id)) {
                 throw new RuntimeException("URL já existe. Escolha outra.");
             }
         }
 
         mapDtoToEntity(dto, content);
+        content.setUrlSlug(newSlug);
         return contentRepository.save(content);
     }
 
@@ -68,7 +85,7 @@ public class ContentService {
         entity.setDisciplina(dto.getDisciplina());
         entity.setTema(dto.getTema());
         entity.setConteudoHtml(dto.getConteudoHtml());
-        entity.setUrlSlug(dto.getUrlSlug());
+        // urlSlug is handled separately to support generation
         entity.setMetaDescription(dto.getMetaDescription());
         entity.setKeywords(dto.getKeywords());
         entity.setDificuldade(dto.getDificuldade());
@@ -78,13 +95,23 @@ public class ContentService {
     }
 
     @Transactional(readOnly = true)
-    public List<Content> getAllPublished() {
-        return contentRepository.findByStatus("PUBLICADO");
+    public Page<Content> getAllPublished(Pageable pageable) {
+        return contentRepository.findByStatus("PUBLICADO", pageable);
     }
 
     @Transactional(readOnly = true)
-    public List<Content> getByClass(Integer classe) {
-        return contentRepository.findByClasseNumeroAndStatusOrderByDisciplinaAsc(classe, "PUBLICADO");
+    public Page<Content> getByClass(Integer classe, Pageable pageable) {
+        return contentRepository.findByClasseNumeroAndStatus(classe, "PUBLICADO", pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Content> getAll(Pageable pageable) {
+        return contentRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Content> search(String query, Pageable pageable) {
+        return contentRepository.searchPublished(query, pageable);
     }
 
     @Transactional
@@ -99,5 +126,18 @@ public class ContentService {
     public Content getById(Long id) {
         return contentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Conteúdo não encontrado"));
+    }
+
+    private String generateSlug(String input) {
+        if (input == null || input.isEmpty()) return "";
+
+        String nowhitespace = input.trim().replaceAll("\\s+", "-");
+        String normalized = Normalizer.normalize(nowhitespace, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        String slug = pattern.matcher(normalized).replaceAll("")
+                .toLowerCase(Locale.ENGLISH)
+                .replaceAll("[^a-z0-9-]", "");
+
+        return slug.replaceAll("-+", "-").replaceAll("^-|-$", "");
     }
 }
