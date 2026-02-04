@@ -3,6 +3,7 @@ package mz.dev.lxrd.ExplicaMoz.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -13,11 +14,13 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "sua-chave-secreta-muito-longa-e-segura-para-explicamoz";
+    @Value("${jwt.secret}")
+    private String secretKey;
+
     private final long EXPIRATION_TIME = 86400000; // 24 horas
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

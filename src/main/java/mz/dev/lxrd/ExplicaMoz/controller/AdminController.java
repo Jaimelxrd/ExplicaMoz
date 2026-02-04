@@ -37,7 +37,7 @@ public class AdminController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AdminLoginDTO login) {
+    public ResponseEntity<?> login(@Valid @RequestBody AdminLoginDTO login) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword())

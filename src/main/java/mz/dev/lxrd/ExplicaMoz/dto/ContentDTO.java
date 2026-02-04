@@ -1,7 +1,13 @@
 package mz.dev.lxrd.ExplicaMoz.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ContentDTO {
 
     @NotNull(message = "Título é obrigatório")
@@ -29,10 +35,9 @@ public class ContentDTO {
     @Size(min = 50, message = "Conteúdo muito curto. Mínimo 50 caracteres") // Reduzido para 50
     private String conteudoHtml;
 
-    @NotNull(message = "URL amigável é obrigatória")
     @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
             message = "URL deve conter apenas letras minúsculas, números e hífens")
-    private String urlSlug;
+    private String urlSlug; // Removido @NotNull para permitir geração automática
 
     @Size(max = 300, message = "Meta descrição deve ter no máximo 300 caracteres") // Torna opcional
     private String metaDescription;
@@ -44,44 +49,4 @@ public class ContentDTO {
     private Integer tempoEstimado;
     private String autor;
     private String status = "RASCUNHO";
-
-    // Getters e Setters
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
-
-    public String getDescricao() { return descricao; }
-    public void setDescricao(String descricao) { this.descricao = descricao; }
-
-    public Integer getClasseNumero() { return classeNumero; }
-    public void setClasseNumero(Integer classeNumero) { this.classeNumero = classeNumero; }
-
-    public String getDisciplina() { return disciplina; }
-    public void setDisciplina(String disciplina) { this.disciplina = disciplina; }
-
-    public String getTema() { return tema; }
-    public void setTema(String tema) { this.tema = tema; }
-
-    public String getConteudoHtml() { return conteudoHtml; }
-    public void setConteudoHtml(String conteudoHtml) { this.conteudoHtml = conteudoHtml; }
-
-    public String getUrlSlug() { return urlSlug; }
-    public void setUrlSlug(String urlSlug) { this.urlSlug = urlSlug; }
-
-    public String getMetaDescription() { return metaDescription; }
-    public void setMetaDescription(String metaDescription) { this.metaDescription = metaDescription; }
-
-    public String getKeywords() { return keywords; }
-    public void setKeywords(String keywords) { this.keywords = keywords; }
-
-    public String getDificuldade() { return dificuldade; }
-    public void setDificuldade(String dificuldade) { this.dificuldade = dificuldade; }
-
-    public Integer getTempoEstimado() { return tempoEstimado; }
-    public void setTempoEstimado(Integer tempoEstimado) { this.tempoEstimado = tempoEstimado; }
-
-    public String getAutor() { return autor; }
-    public void setAutor(String autor) { this.autor = autor; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
 }

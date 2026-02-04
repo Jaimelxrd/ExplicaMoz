@@ -1,6 +1,7 @@
 package mz.dev.lxrd.ExplicaMoz.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +17,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${admin.username}")
+    private String adminUsername;
+
+    @Value("${admin.password}")
+    private String adminPassword;
+
     @Autowired
     public UserDetailsServiceImpl(@Lazy PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
@@ -23,10 +30,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if ("admin".equals(username)) {
-            // Em um sistema real, buscaríamos no banco de dados.
-            // Para o MVP, codificamos a senha "admin123"
-            return new User("admin", passwordEncoder.encode("admin123"), Collections.emptyList());
+        if (adminUsername.equals(username)) {
+            return new User(adminUsername, passwordEncoder.encode(adminPassword), Collections.emptyList());
         }
         throw new UsernameNotFoundException("Usuário não encontrado: " + username);
     }
