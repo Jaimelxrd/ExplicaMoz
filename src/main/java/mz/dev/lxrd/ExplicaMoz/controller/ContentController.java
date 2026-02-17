@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/api/conteudos")
+@RequestMapping(value = "/api/v1/conteudos")
 @CrossOrigin(origins = "*")
 public class ContentController {
 
@@ -48,12 +48,8 @@ public class ContentController {
 
     @GetMapping("/slug/{slug}")
     public ResponseEntity<Content> getBySlug(@PathVariable String slug) {
-        try {
-            Content content = contentService.getBySlug(slug);
-            return ResponseEntity.ok(content);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Content content = contentService.getBySlug(slug);
+        return ResponseEntity.ok(content);
     }
 
     @GetMapping("/relacionados/{id}")

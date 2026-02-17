@@ -2,6 +2,7 @@ package mz.dev.lxrd.ExplicaMoz.service;
 
 import mz.dev.lxrd.ExplicaMoz.domain.Content;
 import mz.dev.lxrd.ExplicaMoz.dto.ContentDTO;
+import mz.dev.lxrd.ExplicaMoz.exception.ResourceNotFoundException;
 import mz.dev.lxrd.ExplicaMoz.repository.ContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -43,7 +44,7 @@ public class ContentService {
     @Transactional
     public Content updateContent(Long id, ContentDTO dto) {
         Content content = contentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Conteúdo não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Conteúdo não encontrado"));
 
         String newSlug = dto.getUrlSlug();
         if (newSlug == null || newSlug.trim().isEmpty()) {
@@ -67,7 +68,7 @@ public class ContentService {
     public Content getBySlug(String slug) {
         Content content = contentRepository.findByUrlSlugAndStatus(slug, "PUBLICADO");
         if (content == null) {
-            throw new RuntimeException("Conteúdo não encontrado ou não publicado");
+            throw new ResourceNotFoundException("Conteúdo não encontrado ou não publicado");
         }
         return content;
     }
@@ -117,7 +118,7 @@ public class ContentService {
     @Transactional
     public void deleteContent(Long id) {
         if (!contentRepository.existsById(id)) {
-            throw new RuntimeException("Conteúdo não encontrado");
+            throw new ResourceNotFoundException("Conteúdo não encontrado");
         }
         contentRepository.deleteById(id);
     }
@@ -125,7 +126,7 @@ public class ContentService {
     @Transactional(readOnly = true)
     public Content getById(Long id) {
         return contentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Conteúdo não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Conteúdo não encontrado"));
     }
 
     private String generateSlug(String input) {

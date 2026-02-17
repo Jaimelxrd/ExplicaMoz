@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/v1/admin")
 @CrossOrigin(origins = "*")
 public class AdminController {
 
@@ -65,41 +65,22 @@ public class AdminController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody ContentDTO dto) {
-        try {
-            Content created = contentService.createContent(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
-        } catch (RuntimeException e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(error);
-        }
+    public ResponseEntity<Content> create(@Valid @RequestBody ContentDTO dto) {
+        Content created = contentService.createContent(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(
+    public ResponseEntity<Content> update(
             @PathVariable Long id,
             @Valid @RequestBody ContentDTO dto) {
-        try {
-            Content updated = contentService.updateContent(id, dto);
-            return ResponseEntity.ok(updated);
-        } catch (RuntimeException e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(error);
-        }
+        Content updated = contentService.updateContent(id, dto);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        try {
-            contentService.deleteContent(id);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.notFound().build();
-        }
-
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        contentService.deleteContent(id);
+        return ResponseEntity.ok().build();
     }
 }
