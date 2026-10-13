@@ -2,7 +2,7 @@
 
 ExplicaMoz é uma plataforma de gestão de conteúdo educacional focada no currículo moçambicano, abrangendo da 6ª à 12ª classe.
 
-## 🚀 Tecnologias
+## Tecnologias
 
 - **Java 17**
 - **Spring Boot**
@@ -11,7 +11,7 @@ ExplicaMoz é uma plataforma de gestão de conteúdo educacional focada no curr�
 - **Lombok**
 - **Maven**
 
-## 📋 Funcionalidades
+## Funcionalidades
 
 - **API Pública**:
   - Listagem de conteúdos publicados.
@@ -22,7 +22,7 @@ ExplicaMoz é uma plataforma de gestão de conteúdo educacional focada no curr�
   - CRUD completo de conteúdos.
   - Gestão de metadados para SEO.
 
-## 🛠️ Como executar
+## Como executar
 
 1. **Requisitos**:
    - JDK 17
@@ -38,7 +38,7 @@ ExplicaMoz é uma plataforma de gestão de conteúdo educacional focada no curr�
    ./mvnw spring-boot:run
    ```
 
-## 🔌 Endpoints Principais
+## Endpoints Principais
 
 ### Público
 - `GET /api/conteudos/publicados`: Lista todos os conteúdos publicados.
@@ -53,7 +53,7 @@ ExplicaMoz é uma plataforma de gestão de conteúdo educacional focada no curr�
 - `PUT /api/admin/{id}`: Atualiza conteúdo existente.
 - `DELETE /api/admin/{id}`: Remove um conteúdo.
 
-## 📝 Próximos Passos (Backlog)
+## Próximos Passos (Backlog)
 
 - [x] Implementar Spring Security com JWT.
 - [x] Adicionar paginação nos endpoints de listagem.
